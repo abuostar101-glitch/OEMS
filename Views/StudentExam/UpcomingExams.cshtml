@@ -1,0 +1,33 @@
+﻿@model IEnumerable<sampleapp.Models.UpcomingExamDto>
+
+
+<h2>📅 Upcoming Exams</h2>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">No upcoming exams.</div>
+}
+else
+{
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Subject</th>
+                <th>Date</th>
+                <th>Start</th>
+                <th>End</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var exam in Model)
+            {
+                <tr>
+                    <td>@exam.SubjectName</td>
+                    <td>@exam.ExamDate.ToString("dd MMM yyyy")</td>
+                    <td>@exam.StartTime</td>
+                    <td>@exam.EndTime</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

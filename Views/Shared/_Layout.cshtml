@@ -1,0 +1,215 @@
+﻿@using System.Security.Claims
+@using System.Text.Json
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@ViewData["Title"] - OEMS</title>
+
+    <!-- ✅ Core Framework CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/lib/bootstrap-icons-1.13.1/bootstrap-icons.css" />
+    <link rel="stylesheet" href="~/css/tempus-dominus.min.css" />
+ <!-- DataTables Bootstrap 5 CSS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" />
+
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.bootstrap5.min.css" />
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+
+    <style>
+        .nav-item.active > .nav-link,
+        .nav-item.active > .dropdown-toggle {
+            font-weight: bold;
+            color: #0d6efd !important;
+        }
+    </style>
+</head>
+<body>
+    @{
+        var isLoggedIn = User.Identity?.IsAuthenticated == true;
+        var username = User.Identity?.Name ?? "User";
+        string? roleName = User.FindFirst(ClaimTypes.Role)?.Value;
+        string currentController = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
+        var isAdmin = User.IsInRole("ADMIN");
+        var isStaff = User.IsInRole("STAFF");
+    }
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-light bg-white border-bottom box-shadow mb-3">
+            <div class="container-fluid">
+                <a class="navbar-brand d-flex align-items-center gap-2" asp-controller="Home" asp-action="Welcome">
+                    <img src="~/images/exam_image.png" alt="Logo" style="width: 40px; height: auto;" />
+                    <span class="fw-bold">OEMS</span>
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="collapse navbar-collapse d-sm-inline-flex justify-content-between" id="navbarContent">
+                    <ul class="navbar-nav me-auto">
+                        @* Admin Menu *@
+                        @if (isLoggedIn && roleName == "ADMIN")
+                        {
+                            <li class="nav-item dropdown @(currentController is "User" or "Role" or "Subject" or "Unlock" ? "active" : "")">
+                                <a class="nav-link dropdown-toggle text-primary fw-semibold" href="#" role="button" data-bs-toggle="dropdown">Admin</a>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" asp-controller="User" asp-action="Index">Users</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Role" asp-action="Index">Roles</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Subject" asp-action="Index">Subjects</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Unlock" asp-action="Index">User Unlock</a></li>
+                                    <li><a class="dropdown-item" asp-controller="EmailSettings" asp-action="Index">Email Settings</a></li>
+                                     <li><a class="dropdown-item" asp-controller="ExamSettings" asp-action="Index">Exam Settings</a></li>
+                                
+                                </ul>
+                            </li>
+                        }
+                     
+                        @* Staff / Admin Operations *@
+                        @if (isLoggedIn && (isAdmin || isStaff))
+                        {
+                            <li class="nav-item dropdown @(currentController is "Question" or "Exam" or "StudentExam")">
+                                <a class="nav-link dropdown-toggle text-success fw-semibold" href="#" role="button" data-bs-toggle="dropdown">Operations</a>
+                                <ul class="dropdown-menu">
+                                    @if (isAdmin)
+                                    {
+                                        <li><a class="dropdown-item" asp-controller="Question" asp-action="Add">Add Question</a></li>
+                                        <li><a class="dropdown-item" asp-controller="Question" asp-action="BulkUpload">Bulk upload</a></li>
+                                        <li><a class="dropdown-item" asp-controller="Question" asp-action="List">List Questions</a></li>
+                                        <li><a class="dropdown-item" asp-controller="StudentExam" asp-action="Create">Create Exam</a></li>
+                                        <li><a class="dropdown-item" asp-controller="StudentExam" asp-action="List">Exam List</a></li>
+                                                                       
+                                    }
+                                    else if (isStaff)
+                                    {
+                                        <li><a class="dropdown-item" asp-controller="StudentExam" asp-action="Create">Create Exam</a></li>
+                                        <li><a class="dropdown-item" asp-controller="StudentExam" asp-action="List">Exam List</a></li>
+                                    }
+                                </ul>
+                            </li>
+                        }
+
+                     
+                        @if (isLoggedIn && (isAdmin || isStaff))
+                        {
+                            <li class="nav-item dropdown @(currentController is "Reports" ? "active" : "")">
+                                <a class="nav-link dropdown-toggle text-warning fw-semibold" href="#" role="button" data-bs-toggle="dropdown">
+                                    Reports
+                                </a>
+                                <ul class="dropdown-menu">
+                                  
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="Reports" asp-action="CompletedExamReport">
+                                            Completed Exam Report
+                                        </a>
+                                    </li>
+                                    @* Add more report links here *@
+                                </ul>
+                            </li>
+                        }
+
+                    </ul>
+                       
+                    
+            
+
+
+
+                    @* Login/Logout *@
+                    <ul class="navbar-nav ms-auto">
+                        @if (isLoggedIn)
+                        {
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">Hello, @username</a>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li><a class="dropdown-item" asp-controller="Home" asp-action="ChangePassword">Change Password</a></li>
+                                    <li>
+                                        <form asp-controller="Home" asp-action="Logout" method="post" class="dropdown-item p-0 m-0">
+                                            <button type="submit" class="btn btn-link text-danger w-100 text-start">
+                                                <i class="bi bi-box-arrow-right"></i> Logout
+                                            </button>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Home" asp-action="Login">Login</a>
+                            </li>
+                        }
+
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="footer text-muted">
+        <div class="container">
+            &copy; 2025 - OEMS - <a asp-controller="Home" asp-action="Privacy">Privacy</a>
+        </div>
+    </footer>
+
+<!-- ✅ jQuery & jQuery UI -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+
+<!-- ✅ Bootstrap & SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<!-- ✅ Official DataTables Core + Bootstrap 5 Integration -->
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+
+<!-- ✅ DataTables Buttons Extensions -->
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.bootstrap5.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.print.min.js"></script>
+
+<!-- ✅ Select2, Tempus Dominus, Validation -->
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+<script src="~/lib/jquery-validation-unobtrusive/dist/jquery.validate.unobtrusive.min.js"></script>
+<script src="~/js/popper.min.js"></script>
+<script src="~/js/luxon.min.js"></script>
+<script src="~/js/tempus-dominus.min.js"></script>
+<script>
+    window.tempusDominus = tempusDominus; // Important!
+</script>
+
+<script src="~/js/site.js" asp-append-version="true"></script>
+
+
+    <script>
+        $(function () {
+            const successMessage = @Html.Raw(JsonSerializer.Serialize(TempData["SuccessMessage"] ?? string.Empty));
+            const errorMessage = @Html.Raw(JsonSerializer.Serialize(TempData["ErrorMessage"] ?? string.Empty));
+
+            if (successMessage.trim() !== "") {
+                Swal.fire({ icon: 'success', title: 'Success!', text: successMessage, timer: 3000, showConfirmButton: false });
+            } else if (errorMessage.trim() !== "") {
+                Swal.fire({ icon: 'error', title: 'Error!', text: errorMessage });
+            }
+
+            new bootstrap.Tooltip(document.body, { selector: '[data-bs-toggle="tooltip"]' });
+        });
+    </script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+    @RenderSection("Styles", required: false)
+</body>
+</html>

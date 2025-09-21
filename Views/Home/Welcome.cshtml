@@ -1,0 +1,22 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Welcome Dashboard</h2>
+
+<div style="display: flex; gap: 20px; margin-top: 20px;">
+    <div style="flex: 1; padding: 20px; background-color: #f1f1f1; border-radius: 10px; text-align: center;">
+        <h3>Total Admins</h3>
+        <p style="font-size: 24px; color: #007bff;">@ViewBag.AdminCount</p>
+    </div>
+
+    <div style="flex: 1; padding: 20px; background-color: #f1f1f1; border-radius: 10px; text-align: center;">
+        <h3>Total Staff</h3>
+        <p style="font-size: 24px; color: #28a745;">@ViewBag.StaffCount</p>
+    </div>
+
+    <div style="flex: 1; padding: 20px; background-color: #f1f1f1; border-radius: 10px; text-align: center;">
+        <h3>Total Students</h3>
+        <p style="font-size: 24px; color: #dc3545;">@ViewBag.StudentCount</p>
+    </div>
+</div>

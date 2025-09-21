@@ -1,0 +1,90 @@
+﻿@model UploadQuestionsViewModel
+@{
+    ViewData["Title"] = "Bulk Upload Questions";
+}
+
+<h2 class="mb-4">Bulk Upload Questions</h2>
+
+<!-- Alert Message Handling -->
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+
+<!-- Upload Form -->
+<form asp-action="UploadQuestions" method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+    <div class="mb-3">
+        <label asp-for="ExcelFile" class="form-label">Upload Excel File (.xlsx)</label>
+        <input asp-for="ExcelFile" id="ExcelFile" type="file" class="form-control" accept=".xlsx,.xls" />
+        <span asp-validation-for="ExcelFile" class="text-danger"></span>
+    </div>
+
+    <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-primary" id="uploadBtn">Upload</button>
+@*         <a asp-action="DownloadSampleExcel" class="btn btn-outline-secondary">Download Sample Excel</a>
+ *@    </div>
+</form>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        // ✅ File Upload Validation
+        $(function () {
+            $('form').on('submit', function (e) {
+                const fileInput = $('#ExcelFile').get(0);
+
+                if (!fileInput || fileInput.files.length === 0) {
+                    e.preventDefault();
+
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'No File Selected',
+                        text: 'Please select an Excel file before uploading.',
+                        confirmButtonText: 'OK'
+                    });
+
+                    return false;
+                }
+
+                $('#uploadBtn').prop('disabled', true).text('Uploading...');
+            });
+        });
+
+        // ✅ Upload Summary Message (from TempData)
+        document.addEventListener("DOMContentLoaded", function () {
+            const summary = '@TempData["UploadSummary"]';
+            if (summary) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Upload Complete',
+                    html: summary.replace(/\n/g, "<br>"),
+                    confirmButtonText: 'OK'
+                });
+            }
+
+            const error = '@TempData["ErrorMessage"]';
+            if (error) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Upload Failed',
+                    text: error,
+                    confirmButtonText: 'OK'
+                });
+            }
+        });
+    </script>
+}

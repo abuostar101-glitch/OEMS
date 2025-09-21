@@ -1,0 +1,32 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Thank You";
+    var reason = TempData["LogoutReason"] as string;
+}
+
+<div class="container mt-5">
+    <div class="text-center">
+        <h2 class="text-success mb-4">Thank You!</h2>
+
+        <div class="alert alert-info fw-semibold">
+            @(!string.IsNullOrEmpty(reason) ? reason : "✅ Your exam has been submitted successfully.")
+        </div>
+
+        <p class="mt-3">You will be redirected to login shortly...</p>
+        <p class="text-muted">🔁 Redirecting in <span id="countdown">5</span> seconds...</p>
+    </div>
+</div>
+
+<script>
+    let seconds = 5;
+    const countdown = document.getElementById("countdown");
+
+    const interval = setInterval(() => {
+        seconds--;
+        countdown.innerText = seconds;
+        if (seconds <= 0) {
+            clearInterval(interval);
+            window.location.href = '/Home/Logout';
+        }
+    }, 1000);
+</script>

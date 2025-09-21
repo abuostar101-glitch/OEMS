@@ -1,0 +1,29 @@
+﻿@model sampleapp.Models.SubjectInfo
+
+<div class="container d-flex justify-content-center mt-5">
+    <div class="card shadow p-4" style="width: 400px;">
+        <form asp-action="UpdateSubject" asp-controller="Subject" method="post">
+
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+            <input asp-for="SubjectId" type="hidden" />
+
+            <div class="mb-3">
+                <label asp-for="SubjectName" class="form-label">Subject Name </label>
+                <input asp-for="SubjectName" class="form-control" id="SubjectName" placeholder="Enter your Name" oninput="this.value = this.value.toUpperCase();" />
+                <span asp-validation-for="SubjectName" class="text-danger"></span>
+            </div>
+
+         @*    <div class="form-check mb-3">
+                <input type="hidden" asp-for="IsActive" value="false" />
+                <input type="checkbox" class="form-check-input" asp-for="IsActive" id="IsActive" />
+                <label class="form-check-label" for="IsActive">Active</label>
+            </div> *@
+
+            <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-primary">Update</button>
+                <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>

@@ -1,0 +1,27 @@
+﻿@model IEnumerable<dynamic>
+@{
+    ViewData["Title"] = "Exam Settings Report";
+}
+<h3>@ViewData["Title"]</h3>
+
+<table class="table table-bordered table-striped datatable">
+    <thead>
+        <tr>
+            <th>Subject</th>
+            <th>Duration (min)</th>
+            <th>Total Marks</th>
+            <th>Pass Marks</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var row in Model)
+        {
+            <tr>
+                <td>@row.SubjectName</td>
+                <td>@row.DurationMinutes</td>
+                <td>@row.TotalMarks</td>
+                <td>@row.PassMarks</td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -1,0 +1,67 @@
+﻿@model sampleapp.Models.SubjectInfo
+
+<div class="container d-flex justify-content-center mt-5">
+    <div class="card shadow-lg p-4" style="width: 400px;">
+        <h4 class="text-center mb-4">
+            @(ViewData["Title"] ?? "Subject Form")
+        </h4>
+
+        <form asp-action="@(ViewContext.RouteData.Values["action"]?.ToString() ?? "Index")" asp-controller="Subject" method="post">
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div asp-validation-summary="All" class="alert alert-danger" role="alert" id="validationSummary"></div>
+            }
+
+            @if (Model != null && Model.SubjectId != 0)
+            {
+                <input type="hidden" asp-for="SubjectId" />
+            }
+
+            <div class="mb-3">
+                <label asp-for="SubjectName" class="form-label">Subject Name</label>
+                <input asp-for="SubjectName" class="form-control" placeholder="Enter subject name" oninput="this.value = this.value.toUpperCase();" />
+                <span asp-validation-for="SubjectName" class="text-danger small"></span>
+            </div>
+
+            <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-primary">
+                    @(Model != null && Model.SubjectId == 0 ? "Add Subject" : "Update Subject")
+                </button>
+                <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        $(document).ready(function () {
+            var alertBox = $('#validationSummary');
+            if (alertBox.length && alertBox.text().trim().length > 0) {
+                // Show it initially, then hide after 5 seconds (5000 ms)
+                alertBox.show();
+                setTimeout(function () {
+                    alertBox.fadeOut('slow');
+                }, 5000);
+            }
+        });
+    </script>
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

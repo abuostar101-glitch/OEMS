@@ -1,0 +1,28 @@
+﻿@model sampleapp.Models.QuizResultViewModel
+
+<div class="container mt-5">
+    <div class="card shadow-sm p-4" style="max-width: 500px; margin: auto;">
+        <h2 class="text-center mb-4">Quiz Result</h2>
+
+        <ul class="list-group mb-4">
+            <li class="list-group-item d-flex justify-content-between">
+                <strong>Total Questions:</strong>
+                <span>@Model.TotalQuestions</span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between">
+                <strong>Correct Answers:</strong>
+                <span>@Model.CorrectAnswers</span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between">
+                <strong>Score:</strong>
+                <span>@Model.ScorePercentage %</span>
+            </li>
+        </ul>
+
+        <div class="text-center">
+            <a href="@Url.Action("StartQuiz", "Question")" class="btn btn-primary">
+                Retake Quiz
+            </a>
+        </div>
+    </div>
+</div>

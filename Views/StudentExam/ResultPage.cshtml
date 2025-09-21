@@ -1,0 +1,68 @@
+﻿@model OEMS.Models.StudentExamResultViewModel
+
+@{
+    ViewData["Title"] = "Exam Result";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-5">
+    <div class="card shadow-lg p-4">
+        <h2 class="text-success text-center mb-4">📊 Exam Result</h2>
+        <table class="table table-bordered">
+            <tr>
+                <th>Subject</th>
+                <td>@Model.SubjectName</td>
+            </tr>
+            <tr>
+                <th>Score</th>
+                <td>@Model.Score</td>
+            </tr>
+            <tr>
+                <th>Percentage</th>
+                <td>@Model.Percentage.ToString("F2") %</td>
+            </tr>
+            <tr>
+                <th>Result</th>
+                <td class="fw-bold text-@(Model.Result == "Pass" ? "success" : "danger")">
+                    @Model.Result
+                </td>
+            </tr>
+            <tr>
+                <th>Exam Date</th>
+                <td>@Model.ExamDate.ToShortDateString()</td>
+            </tr>
+            <tr>
+                <th>Exam Time</th>
+                <td>@Model.ExamTime.ToString(@"hh\:mm")</td>
+            </tr>
+            <tr>
+                <th>Submitted At</th>
+                <td>@Model.SubmittedAt?.ToString("f")</td>
+            </tr>
+        </table>
+
+        <div class="text-center mt-3">
+            <p class="text-muted">You will be logged out in <span id="countdown">10</span> seconds...</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    let seconds = 10;
+    const countdownEl = document.getElementById('countdown');
+
+    const timer = setInterval(() => {
+        seconds--;
+        countdownEl.textContent = seconds;
+        if (seconds <= 0) {
+            clearInterval(timer);
+            window.location.href = '/Home/Logout';
+        }
+    }, 1000);
+
+    // Prevent back button navigation
+    history.pushState(null, "", location.href);
+    window.onpopstate = function () {
+        location.replace('/Home/Login');
+    };
+</script>

@@ -1,0 +1,33 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+}
+
+<div class="container mt-4">
+    <h3 class="mb-3">📘 Exam Instructions</h3>
+
+    <ul class="list-group list-group-flush fs-6">
+        <li class="list-group-item">🖥️ Use a stable internet connection.</li>
+        <li class="list-group-item">🚫 Do not refresh or close the browser during the exam.</li>
+        <li class="list-group-item">📴 Avoid switching tabs — doing so may auto-submit.</li>
+        <li class="list-group-item">📝 Once started, the timer will begin and cannot be paused.</li>
+        <li class="list-group-item">✅ Click <strong>Start Exam</strong> only when you're ready.</li>
+    </ul>
+
+    <div class="mt-4">
+        @if (ViewBag.ExamLink == 1)
+        {
+            <a href="@Url.Action("StartExamPage", "StudentExam", new { subjectId = ViewBag.SubjectId })" class="btn btn-success">Start Exam</a>
+         
+        }
+        else
+        {
+            <button class="btn btn-secondary" disabled>Start Exam</button>
+            <p class="text-danger mt-2">Please wait for the next exam or contact your admin.</p>
+        }
+    </div>
+</div>

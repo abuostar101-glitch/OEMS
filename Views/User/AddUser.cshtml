@@ -1,0 +1,73 @@
+﻿@model sampleapp.Models.UserInfo
+
+@{
+    ViewData["Title"] = "Add User";
+}
+
+<h2 class="text-center my-4">Add User</h2>
+
+<div class="container d-flex justify-content-center">
+    <div class="card shadow p-4" style="width: 400px;">
+        <form asp-action="AddUser" asp-controller="User" method="post" onsubmit="this.querySelector('button[type=submit]').disabled = true;">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="UserId" />
+
+            <!-- ✅ Duplicate or general errors shown here (not above inputs) -->
+            @if (!ViewData.ModelState.IsValid)
+            {
+                var generalErrors = ViewData.ModelState[string.Empty]?.Errors;
+                if (generalErrors?.Count > 0)
+                {
+                    <div class="alert alert-danger">
+                        @foreach (var error in generalErrors)
+                        {
+                            <div>@error.ErrorMessage</div>
+                        }
+                    </div>
+                }
+            }
+
+            <!-- FIELD: Username -->
+            <div class="mb-3">
+                <label asp-for="UserName" class="form-label">User Name</label>
+                <input asp-for="UserName" class="form-control" placeholder="Enter user name" oninput="this.value = this.value.toUpperCase();" />
+                <span asp-validation-for="UserName" class="text-danger small"></span>
+            </div>
+
+            <!-- FIELD: Email -->
+            <div class="mb-3">
+                <label asp-for="EmailId" class="form-label">Email Address</label>
+                <input asp-for="EmailId" class="form-control" placeholder="Enter email address" oninput="this.value = this.value.toLowerCase();" />
+                <span asp-validation-for="EmailId" class="text-danger small"></span>
+            </div>
+
+            <!-- FIELD: Role -->
+            <div class="mb-3">
+                <label asp-for="RoleId" class="form-label">Role</label>
+                <select asp-for="RoleId" class="form-select">
+                    <option value="">-- Select Role --</option>
+                    @if (Model.Roles != null)
+                    {
+                        foreach (var role in Model.Roles)
+                        {
+                            <option value="@role.Value" selected="@(role.Value == Model.RoleId.ToString())">
+                                @role.Text
+                            </option>
+                        }
+                    }
+                </select>
+                <span asp-validation-for="RoleId" class="text-danger small"></span>
+            </div>
+
+            <!-- Submit -->
+            <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-primary">ADD</button>
+                <a asp-action="Index" asp-controller="User" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

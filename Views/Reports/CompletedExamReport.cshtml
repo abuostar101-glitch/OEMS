@@ -1,0 +1,293 @@
+﻿@model OEMS.Models.CompletedExamReportViewModel
+@{
+    ViewData["Title"] = "Completed Exam Report";
+}
+
+<div class="container mt-5">
+    <h3 class="text-center mb-4 fw-bold">📊 Completed Exam Report</h3>
+
+    <!-- Filters Row -->
+      <form method="get" action="@Url.Action("CompletedExamReport", "Reports")">
+        <div class="row mb-4 g-3 align-items-end">
+            <!-- Subject -->
+            <div class="col-md-3">
+                <select id="subjectSelect" name="subjectId" class="form-select filter-input">
+                    <option value="">📘 Select Subject</option>
+                    @foreach (var s in ViewBag.Subjects as List<OEMS.Models.SubjectModel>)
+                    {
+                        if (ViewBag.SubjectId != null && (int)ViewBag.SubjectId == s.SubjectId)
+                        {
+                            @:
+                            <option value="@s.SubjectId" selected>@s.SubjectName</option>
+                        }
+                        else
+                        {
+                            @:
+                            <option value="@s.SubjectId">@s.SubjectName</option>
+                        }
+                    }
+                </select>
+
+            </div>
+
+            <!-- Start Date -->
+            <div class="col-md-3">
+                <div class="input-group" id="startDatePicker" data-td-target-input="nearest" data-td-toggle="datetimepicker">
+                    <input name="startDate" type="text" class="form-control filter-input"
+                           placeholder="📅 Start Date"
+                           value="@(ViewBag.StartDate ?? "")"
+                           data-td-target="#startDatePicker" readonly />
+                    <span class="input-group-text" data-td-target="#startDatePicker" data-td-toggle="datetimepicker">
+                        <i class="bi bi-calendar"></i>
+                    </span>
+                </div>
+            </div>
+
+            <!-- End Date -->
+            <div class="col-md-3">
+                <div class="input-group" id="endDatePicker" data-td-target-input="nearest" data-td-toggle="datetimepicker">
+                    <input name="endDate" type="text" class="form-control filter-input"
+                           placeholder="📅 End Date"
+                           value="@(ViewBag.EndDate ?? "")"
+                           data-td-target="#endDatePicker" readonly />
+                    <span class="input-group-text" data-td-target="#endDatePicker" data-td-toggle="datetimepicker">
+                        <i class="bi bi-calendar"></i>
+                    </span>
+                </div>
+            </div>
+
+            <!-- Buttons -->
+            <div class="col-md-3 d-flex gap-2">
+                <button type="submit" class="btn btn-primary flex-grow-1"><i class="bi bi-filter-circle"></i> Filter</button>
+                <a href="@Url.Action("CompletedExamReport", "Reports")" class="btn btn-outline-secondary flex-grow-1"><i class="bi bi-x-circle"></i> Clear</a>
+            </div>
+        </div>
+    </form>
+
+    <!-- Summary Cards Row -->
+    <div class="row text-center mb-4 g-3">
+        <div class="col-md-3">
+            <div class="card summary-card bg-gradient-primary text-white">
+                <h6>Total Students</h6>
+                <h4 class="fw-bold counter">@Model.TotalStudents</h4>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card summary-card bg-gradient-success text-white">
+                <h6>Passed</h6>
+                <h4 class="fw-bold counter">@Model.TotalPass</h4>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card summary-card bg-gradient-danger text-white">
+                <h6>Failed</h6>
+                <h4 class="fw-bold counter">@Model.TotalFail</h4>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card summary-card bg-gradient-info text-white">
+                <h6>Average %</h6>
+                <h4 class="fw-bold counter">@Model.AvgPercentage</h4>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top Performer -->
+    @if (Model.TopPerformer != null)
+    {
+        <div class="alert alert-gradient shadow-sm mb-4 d-flex align-items-center justify-content-center fw-bold fs-5">
+            <i class="bi bi-trophy-fill me-2"></i>
+            Top Performer: @Model.TopPerformer.UserName (@Model.TopPerformer.Percentage %)
+        </div>
+    }
+
+    <!-- Exam Table -->
+    <div class="table-responsive shadow-sm mb-4">
+        <table class="table table-bordered table-striped table-hover align-middle text-center">
+            <thead class="table-dark">
+                <tr>
+                    <th>Reg No</th>
+                    <th>Student</th>
+                    <th>Subject</th>
+                    <th>Exam Date</th>
+                    <th>Score</th>
+                    <th>Percentage</th>
+                    <th>Result</th>
+                    <th>Submitted At</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var exam in Model.Exams)
+                {
+                    var badgeClass = exam.Result.Trim().ToUpper() == "FAIL" ? "badge bg-danger" : "badge bg-success";
+                    <tr>
+                        <td>@exam.RegNo</td>
+                        <td>@exam.UserName</td>
+                        <td>@exam.SubjectName</td>
+                        <td>@exam.SubmittedAt.ToString("dd-MM-yyyy")</td>
+                        <td>@exam.Score</td>
+                        <td>@exam.Percentage %</td>
+                        <td><span class="@badgeClass">@exam.Result</span></td>
+                        <td>@exam.SubmittedAt.ToString("dd-MM-yyyy HH:mm")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="row g-3 mb-5">
+        <div class="col-md-6">
+            <canvas id="examChart"></canvas>
+        </div>
+        <div class="col-md-6">
+            <canvas id="topScoresChart"></canvas>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/lib/jquery/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <link href="~/lib/select2/css/select2.min.css" rel="stylesheet" />
+    <script src="~/lib/select2/js/select2.min.js"></script>
+    <link href="~/lib/tempusdominus/css/tempusdominus.min.css" rel="stylesheet" />
+    <script src="~/lib/tempusdominus/js/tempusdominus.min.js"></script>
+    <script src="~/lib/chartjs/chart.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            // Select2
+            $('#subjectSelect').select2({ placeholder: "Select Subject", allowClear: true, width: '100%' });
+
+            // Date Pickers
+            new tempusDominus.TempusDominus(document.getElementById('startDatePicker'), {
+                display: { components: { calendar: true, date: true, month: true, year: true } },
+                localization: { format: 'dd/MM/yyyy' }
+            });
+            new tempusDominus.TempusDominus(document.getElementById('endDatePicker'), {
+                display: { components: { calendar: true, date: true, month: true, year: true } },
+                localization: { format: 'dd/MM/yyyy' }
+            });
+
+            // Counter Animation
+            $('.counter').each(function () {
+                $(this).prop('Counter', 0).animate({
+                    Counter: $(this).text()
+                }, {
+                    duration: 1200,
+                    easing: 'swing',
+                    step: function (now) { $(this).text(Math.ceil(now)); }
+                });
+            });
+
+            // Pie Chart
+            var ctx = document.getElementById('examChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: ['Pass', 'Fail'],
+                    datasets: [{ data: [@Model.TotalPass, @Model.TotalFail], backgroundColor: ['#28a745', '#dc3545'] }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+            });
+
+            // Top 5 Scores Bar Chart
+            var topCtx = document.getElementById('topScoresChart').getContext('2d');
+            var topLabels = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.Exams.Select(e => e.UserName).Take(5)));
+            var topScores = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.Exams.Select(e => e.Score).Take(5)));
+            new Chart(topCtx, {
+                type: 'bar',
+                data: { labels: topLabels, datasets: [{ label: 'Top Scores', data: topScores, backgroundColor: '#007bff' }] },
+                options: { responsive: true, plugins: { legend: { display: false } } }
+            });
+        });
+    </script>
+
+    <style>
+        /* Professional filter inputs */
+        .filter-input {
+            height: 50px;
+            border-radius: 0.5rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            font-size: 1rem;
+            padding-left: 0.75rem;
+        }
+
+            .filter-input:focus {
+                border-color: #4e54c8;
+                box-shadow: 0 0 0 0.2rem rgba(78, 84, 200, 0.25);
+                outline: none;
+            }
+
+        .input-group-text {
+            height: 50px;
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #fff;
+            border-left: 0;
+        }
+
+        /* Fix Select2 height */
+        .select2-container .select2-selection--single {
+            height: 50px !important;
+            border-radius: 0.5rem;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            line-height: 50px !important;
+            padding-left: 0.75rem;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 50px !important;
+        }
+
+        /* Summary Cards */
+        .summary-card {
+            padding: 1rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+        }
+
+            .summary-card:hover {
+                transform: scale(1.07);
+            }
+
+        .bg-gradient-primary {
+            background: linear-gradient(135deg, #4e54c8, #8f94fb);
+        }
+
+        .bg-gradient-success {
+            background: linear-gradient(135deg, #28a745, #71dd8a);
+        }
+
+        .bg-gradient-danger {
+            background: linear-gradient(135deg, #dc3545, #ff6b6b);
+        }
+
+        .bg-gradient-info {
+            background: linear-gradient(135deg, #17a2b8, #6dd5ed);
+        }
+
+        .alert-gradient {
+            background: linear-gradient(135deg, #f6d365, #fda085);
+            color: #fff;
+            font-weight: 600;
+            border: none;
+            border-radius: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .table-hover tbody tr:hover {
+            background-color: #f1f5f9 !important;
+            transform: scale(1.01);
+            transition: all 0.2s;
+        }
+    </style>
+}

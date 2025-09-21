@@ -1,0 +1,80 @@
+﻿@model sampleapp.Models.ExamSessionDto
+
+@{
+    var question = Model.Questions[Model.CurrentIndex];
+    var selectedAnswer = Model.Answers.ContainsKey(question.QuestionId) ? Model.Answers[question.QuestionId] : "";
+    var total = Model.Questions.Count;
+    var endTimestamp = Model.EndTime.ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ"); // Ensure UTC
+}
+
+<div class="card shadow rounded-3 exam-question-card">
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+        <span>Question @(Model.CurrentIndex + 1) of @total</span>
+        <span id="timer" class="fw-bold text-warning"></span>
+    </div>
+
+    <div class="card-body">
+        <form id="examForm" method="post">
+            <input type="hidden" name="QuestionId" value="@question.QuestionId" />
+
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="SelectedOption" value="A" @(selectedAnswer == "A" ? "checked" : "") />
+                <label class="form-check-label">@question.OptionA</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="SelectedOption" value="B" @(selectedAnswer == "B" ? "checked" : "") />
+                <label class="form-check-label">@question.OptionB</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="SelectedOption" value="C" @(selectedAnswer == "C" ? "checked" : "") />
+                <label class="form-check-label">@question.OptionC</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="SelectedOption" value="D" @(selectedAnswer == "D" ? "checked" : "") />
+                <label class="form-check-label">@question.OptionD</label>
+            </div>
+
+            <div class="mt-4 d-flex justify-content-between">
+                @if (Model.CurrentIndex > 0)
+                {
+                    <button type="button" class="btn btn-secondary" onclick="navigate('prev')">Previous</button>
+                }
+                @if (Model.CurrentIndex < total - 1)
+                {
+                    <button type="button" class="btn btn-primary" onclick="navigate('next')">Next</button>
+                }
+                else
+                {
+                    <button type="submit" formaction="@Url.Action("SubmitExam", "StudentExam")" class="btn btn-success">Submit</button>
+                }
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Don't rebind timer if already running (avoid multiple intervals)
+    if (!window.timerInitialized) {
+        window.timerInitialized = true;
+        let endTime = new Date("@endTimestamp").getTime();
+
+        function updateTimer() {
+            let now = new Date().getTime();
+            let distance = endTime - now;
+
+            if (distance <= 0) {
+                document.getElementById("timer").innerHTML = "Time's up!";
+                document.getElementById("examForm").submit();
+                return;
+            }
+
+            let minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            let seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            document.getElementById("timer").innerHTML = `${minutes}m ${seconds}s`;
+        }
+
+        updateTimer();
+        setInterval(updateTimer, 1000);
+    }
+</script>

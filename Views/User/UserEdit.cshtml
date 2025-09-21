@@ -1,0 +1,53 @@
+﻿@model sampleapp.Models.UserInfo
+
+@{
+    ViewData["Title"] = "Edit User";
+}
+
+<h2 class="text-center mb-4">Edit User</h2>
+
+<div class="container d-flex justify-content-center">
+    <div class="card shadow-sm p-4 rounded-4" style="width: 380px;">
+        <h5 class="text-center mb-3 text-primary">Edit User Details</h5>
+
+        <form asp-action="UserEdit" asp-controller="User" method="post">
+            <input type="hidden" asp-for="UserId" />
+
+            <div class="mb-3">
+                <label class="form-label">Reg. Number</label>
+                <input asp-for="RegNo" class="form-control form-control-sm" readonly />
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="UserName" class="form-label">Name</label>
+                <input asp-for="UserName" class="form-control form-control-sm"
+                       placeholder="Enter name" oninput="this.value = this.value.toUpperCase();" />
+                <span asp-validation-for="UserName" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="EmailId" class="form-label">Email</label>
+                <input asp-for="EmailId" class="form-control form-control-sm"
+                       placeholder="Enter email" oninput="this.value = this.value.toLowerCase();" />
+                <span asp-validation-for="EmailId" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Role</label>
+                <input class="form-control form-control-sm" value="@Model.RoleName" readonly />
+                <input type="hidden" asp-for="RoleId" />
+            </div>
+
+            <div class="d-grid gap-2 mt-3">
+                <button type="submit" class="btn btn-success btn-sm">
+                    <i class="bi bi-check-circle"></i> Update
+                </button>
+                <a asp-action="Index" class="btn btn-outline-secondary btn-sm">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

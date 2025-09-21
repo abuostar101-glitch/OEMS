@@ -1,0 +1,194 @@
+﻿@model OEMS.Models.StudentExamViewModel
+@{
+    ViewData["Title"] = "Schedule Exam";
+}
+
+<div class="container d-flex justify-content-center mt-5">
+    <div class="card shadow-lg p-4" style="max-width: 900px; width: 100%;">
+        <h4 class="text-center mb-4">Schedule Exam</h4>
+
+        <style>
+            label.form-label {
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                font-weight: 600;
+                font-size: 1rem;
+                color: #2c3e50;
+                letter-spacing: 0.03em;
+                text-transform: uppercase;
+                margin-bottom: 0.3rem;
+                display: inline-block;
+            }
+        </style>
+
+        <form asp-action="Create" method="post" novalidate>
+            @Html.AntiForgeryToken()
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label asp-for="RegistrationNumber" class="form-label">Registration No</label>
+                        <select asp-for="RegistrationNumber" asp-items="Model.RegNos" class="form-select" id="regNoSelect">
+                            <option value="">-- Select Registration No --</option>
+                        </select>
+                        <span asp-validation-for="RegistrationNumber" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="SubjectName" class="form-label">Subject</label>
+                        <select asp-for="SubjectId" asp-items="Model.Subjects" class="form-select" id="subjectSelect">
+                            <option value="">-- Select Subject --</option>
+                        </select>
+                        <span asp-validation-for="SubjectId" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <!-- Exam Date -->
+                    <div class="mb-3">
+                        <label asp-for="ExamDate" class="form-label">Exam Date</label>
+                        <div class="input-group" id="examDatePicker" data-td-target-input="nearest" data-td-target-toggle="nearest">
+                            <input asp-for="ExamDate"
+                                   type="text"
+                                   id="examDateInput"
+                                   class="form-control"
+                                   placeholder="dd/MM/yyyy"
+                                   data-td-target="#examDatePicker"
+                                   readonly />
+                            <span class="input-group-text"
+                                  data-td-target="#examDatePicker"
+                                  data-td-toggle="datetimepicker">
+                                <i class="bi bi-calendar"></i>
+                            </span>
+                        </div>
+                        <span asp-validation-for="ExamDate" class="text-danger"></span>
+                    </div>
+
+                    <!-- Exam Time -->
+                    <div class="mb-3">
+                        <label asp-for="ExamTime" class="form-label">Exam Time</label>
+                        <div class="input-group" id="timePicker" data-td-target-input="nearest" data-td-target-toggle="nearest">
+                            <input asp-for="ExamTime"
+                                   type="text"
+                                   id="examTimeInput"
+                                   class="form-control"
+                                   placeholder="hh.mm"
+                                   data-td-target="#timePicker"
+                                   readonly />
+                            <span class="input-group-text"
+                                  data-td-target="#timePicker"
+                                  data-td-toggle="datetimepicker">
+                                <i class="bi bi-clock"></i>
+                            </span>
+                        </div>
+                        <span asp-validation-for="ExamTime" class="text-danger"></span>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="mt-3 d-flex justify-content-end gap-2">
+                <button type="submit" class="btn btn-success">
+                    <i class="bi bi-check-circle"></i> Schedule
+                </button>
+                <a asp-action="List" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <!-- Select2 -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Exam Date Picker
+               new tempusDominus.TempusDominus(document.getElementById('examDatePicker'), {
+            display: {
+                icons: {
+                    type: 'icons',
+                    date: 'bi bi-calendar',
+                    previous: 'bi bi-chevron-left',
+                    next: 'bi bi-chevron-right',
+                    today: 'bi bi-calendar-check',
+                    clear: 'bi bi-trash',
+                    close: 'bi bi-x'
+                }
+            },
+            localization: {
+                format: 'dd/MM/yyyy'
+            }
+        });
+
+            // Exam Time Picker
+            new tempusDominus.TempusDominus(document.getElementById('timePicker'), {
+                display: {
+                    components: {
+                        calendar: false,
+                        date: false,
+                        month: false,
+                        year: false,
+                        decades: false,
+                        clock: true,
+                        hours: true,
+                        minutes: true,
+                        seconds: false,
+                        useTwentyfourHour: true
+                    },
+                    icons: {
+                        type: 'icons',
+                        time: 'bi bi-clock',
+                        up: 'bi bi-chevron-up',
+                        down: 'bi bi-chevron-down',
+                        clear: 'bi bi-trash',
+                        close: 'bi bi-x'
+                    }
+                },
+                localization: {
+                    format: 'HH:mm'
+                }
+            });
+
+            // Enable Select2
+            $('#regNoSelect').select2({
+                placeholder: "Select Registration No",
+                allowClear: true,
+                width: '100%'
+            });
+
+            $('#subjectSelect').select2({
+                placeholder: "Select Subject",
+                allowClear: true,
+                width: '100%'
+            });
+        });
+    </script>
+
+    @if (ViewBag.RegNoError != null)
+    {
+        <script>
+            Swal.fire({
+                icon: 'error',
+                title: 'Registration Error',
+                text: '@ViewBag.RegNoError',
+                confirmButtonText: 'OK'
+            });
+        </script>
+    }
+
+    @if (ViewBag.DuplicateError != null)
+    {
+        <script>
+            Swal.fire({
+                icon: 'warning',
+                title: 'Duplicate Schedule',
+                text: '@ViewBag.DuplicateError',
+                confirmButtonText: 'OK'
+            });
+        </script>
+    }
+}

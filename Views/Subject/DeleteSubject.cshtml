@@ -1,0 +1,27 @@
+﻿@model sampleapp.Models.SubjectInfo
+
+<h2 class="text-center mt-4">Delete Subject</h2>
+
+
+<div class="container d-flex justify-content-center mt-5">
+    <div class="card shadow p-4" style="width: 400px;">
+        <h4 class="mb-4 text-center text-danger">Confirm Delete</h4>
+
+        <form asp-action="DeleteConfirmed" asp-controller="Subject" method="post">
+            <input asp-for="SubjectId" type="hidden" />
+            <div asp-validation-summary="All" class="text-danger"></div> <!-- SHOW ERRORS HERE -->
+
+
+            <div class="mb-3">
+                <label asp-for="SubjectName" class="form-label">Subject Name</label>
+                <input asp-for="SubjectName" class="form-control" readonly />
+                <span asp-validation-for="SubjectName" class="text-danger"></span>
+            </div>
+
+            <div>
+                <button type="submit" class="btn btn-danger">Delete</button>
+                <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>

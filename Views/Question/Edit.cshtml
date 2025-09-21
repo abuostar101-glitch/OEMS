@@ -1,0 +1,96 @@
+﻿@model sampleapp.Models.QuestionViewModel
+
+<div class="container d-flex justify-content-center mt-4">
+    <div class="card shadow-lg p-4" style="max-width: 900px; width: 100%; max-height: 650px; overflow-y: auto;">
+        <h4 class="text-center mb-3">Edit Question</h4>
+
+        <style>
+            label.form-label {
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                font-weight: 600;
+                font-size: 1rem;
+                color: #2c3e50;
+                letter-spacing: 0.03em;
+                text-transform: uppercase;
+                margin-bottom: 0.3rem;
+                display: inline-block;
+            }
+
+            textarea.form-control {
+                resize: vertical; /* allow only vertical resize */
+                height: 100px !important; /* reduce default height */
+            }
+        </style>
+
+        <form asp-action="Edit" method="post" novalidate>
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="QuestionId" />
+
+            <div class="row g-3">
+                <!-- add some gutter space -->
+                <div class="col-md-6">
+                    <div class="mb-2">
+                        <label asp-for="SubjectId" class="form-label">Subject</label>
+                        <select asp-for="SubjectId" asp-items="ViewBag.Subjects" class="form-select" title="Select the subject for this question">
+                            <option value="">-- Select Subject --</option>
+                        </select>
+                        <span asp-validation-for="SubjectId" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-2">
+                        <label asp-for="QuestionText" class="form-label">Question Text</label>
+                        <textarea asp-for="QuestionText" class="form-control" placeholder="Enter the question here..." maxlength="500" rows="4" title="Type the question you want to ask (max 500 characters)"></textarea>
+                        <span asp-validation-for="QuestionText" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-2">
+                        <label asp-for="CorrectAnswer" class="form-label">Correct Answer</label>
+                        <select asp-for="CorrectAnswer" class="form-select" title="Choose the correct option">
+                            <option value="">-- Select Correct Answer --</option>
+                            <option value="A">A</option>
+                            <option value="B">B</option>
+                            <option value="C">C</option>
+                            <option value="D">D</option>
+                        </select>
+                        <span asp-validation-for="CorrectAnswer" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="mb-2">
+                        <label asp-for="OptionA" class="form-label">Option A</label>
+                        <input asp-for="OptionA" class="form-control" placeholder="Enter option A" maxlength="100" title="Option A text (max 100 chars)" />
+                        <span asp-validation-for="OptionA" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-2">
+                        <label asp-for="OptionB" class="form-label">Option B</label>
+                        <input asp-for="OptionB" class="form-control" placeholder="Enter option B" maxlength="100" title="Option B text (max 100 chars)" />
+                        <span asp-validation-for="OptionB" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-2">
+                        <label asp-for="OptionC" class="form-label">Option C</label>
+                        <input asp-for="OptionC" class="form-control" placeholder="Enter option C" maxlength="100" title="Option C text (max 100 chars)" />
+                        <span asp-validation-for="OptionC" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-2">
+                        <label asp-for="OptionD" class="form-label">Option D</label>
+                        <input asp-for="OptionD" class="form-control" placeholder="Enter option D" maxlength="100" title="Option D text (max 100 chars)" />
+                        <span asp-validation-for="OptionD" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-3 d-flex gap-2">
+                <button type="submit" class="btn btn-primary me-2">Update Question</button>
+                <a asp-action="List" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

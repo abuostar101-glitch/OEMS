@@ -1,0 +1,125 @@
+﻿@model sampleapp.Models.ExamSessionDto
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var question = Model.Questions[Model.CurrentIndex];
+    var selectedAnswer = Model.Answers.ContainsKey(question.QuestionId) ? Model.Answers[question.QuestionId] : "";
+    var total = Model.Questions.Count;
+    var endTimeUtc = Model.EndTime.ToUniversalTime();
+}
+
+<div class="container mt-4">
+    <div class="card shadow rounded-3">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <span>Question @(Model.CurrentIndex + 1) of @total</span>
+            <span><span class="badge bg-success" id="timer">Loading...</span></span>
+        </div>
+
+        <div class="progress" style="height: 5px;">
+            <div class="progress-bar bg-info" role="progressbar" style="width: @(100 * (Model.CurrentIndex + 1) / total)%"></div>
+        </div>
+
+        <div class="card-body">
+            <form id="examForm" method="post" action="@Url.Action("SubmitExam", "StudentExam")">
+                <input type="hidden" name="QuestionId" value="@question.QuestionId" />
+
+                <h5 class="mb-3">@question.QuestionText</h5>
+
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="SelectedOption" value="A" @(selectedAnswer == "A" ? "checked" : "")>
+                    <label class="form-check-label">@question.OptionA</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="SelectedOption" value="B" @(selectedAnswer == "B" ? "checked" : "")>
+                    <label class="form-check-label">@question.OptionB</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="SelectedOption" value="C" @(selectedAnswer == "C" ? "checked" : "")>
+                    <label class="form-check-label">@question.OptionC</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="SelectedOption" value="D" @(selectedAnswer == "D" ? "checked" : "")>
+                    <label class="form-check-label">@question.OptionD</label>
+                </div>
+
+                <div class="mt-4 d-flex justify-content-between">
+                    @if (Model.CurrentIndex > 0)
+                    {
+                        <button type="button" class="btn btn-secondary" onclick="navigate('prev')">Previous</button>
+                    }
+                    @if (Model.CurrentIndex < total - 1)
+                    {
+                        <button type="button" class="btn btn-primary" onclick="navigate('next')">Next</button>
+                    }
+                    else
+                    {
+                        <button type="submit" class="btn btn-success">Submit</button>
+                    }
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const endTime = new Date("@endTimeUtc.ToString("yyyy-MM-ddTHH:mm:ssZ")").getTime();
+
+        function updateTimer() {
+            const now = new Date().getTime();
+            const distance = endTime - now;
+
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            const timer = document.getElementById("timer");
+
+            if (distance > 0) {
+                timer.innerHTML = `${minutes}m ${seconds}s`;
+
+                if (distance < 60000) {
+                    timer.classList.remove('bg-success');
+                    timer.classList.add('bg-danger');
+                }
+            } else {
+                timer.innerHTML = "⏰ Time's up!";
+                document.getElementById("examForm")?.submit();
+            }
+        }
+
+        setInterval(updateTimer, 1000);
+
+        function navigate(direction) {
+            const selected = document.querySelector('input[name="SelectedOption"]:checked');
+            if (!selected) {
+                alert("Please select an option before proceeding.");
+                return;
+            }
+
+            const form = document.getElementById("examForm");
+            const data = new FormData(form);
+            data.append("Direction", direction);
+
+            fetch("@Url.Action("Navigate", "StudentExam")", {
+                method: "POST",
+                body: data
+            })
+            .then(res => res.text())
+            .then(html => {
+                // 🔁 Replace the full page since no partial view is used
+                document.open();
+                document.write(html);
+                document.close();
+            })
+            .catch(err => {
+                alert("Error occurred. Please refresh.");
+            });
+        }
+
+        // Prevent double submit
+        document.addEventListener("submit", function (e) {
+            const btn = e.target.querySelector("button[type='submit']");
+            if (btn) btn.disabled = true;
+        });
+    </script>
+}
