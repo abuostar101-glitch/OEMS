@@ -135,15 +135,32 @@
         </table>
     </div>
 
-    <!-- Charts Row -->
-    <div class="row g-3 mb-5">
-        <div class="col-md-6">
-            <canvas id="examChart"></canvas>
-        </div>
-        <div class="col-md-6">
-            <canvas id="topScoresChart"></canvas>
+    <div class="d-flex justify-content-end mb-2">
+        <div class="dropdown">
+            <button class="btn btn-primary dropdown-toggle" type="button" id="downloadDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="bi bi-download"></i> Download
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="downloadDropdown">
+                <li>
+                    <a class="dropdown-item excel-item" href="@Url.Action("DownloadExamReport", "Reports", new { subjectId = ViewBag.SubjectId, startDate = ViewBag.StartDate, endDate = ViewBag.EndDate })">
+                        <i class="bi bi-file-earmark-excel"></i> Excel
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item csv-item" href="@Url.Action("DownloadExamReportCsv", "Reports", new { subjectId = ViewBag.SubjectId, startDate = ViewBag.StartDate, endDate = ViewBag.EndDate })">
+                        <i class="bi bi-file-earmark-text"></i> CSV
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item pdf-item" href="@Url.Action("DownloadExamReportPdf", "Reports", new { subjectId = ViewBag.SubjectId, startDate = ViewBag.StartDate, endDate = ViewBag.EndDate })">
+                        <i class="bi bi-file-earmark-pdf"></i> PDF
+                    </a>
+                </li>
+            </ul>
         </div>
     </div>
+
+
 </div>
 
 @section Scripts {
@@ -201,6 +218,7 @@
                 data: { labels: topLabels, datasets: [{ label: 'Top Scores', data: topScores, backgroundColor: '#007bff' }] },
                 options: { responsive: true, plugins: { legend: { display: false } } }
             });
+         
         });
     </script>
 
@@ -289,5 +307,64 @@
             transform: scale(1.01);
             transition: all 0.2s;
         }
+        /* Dropdown Button */
+        #downloadDropdown {
+            background: linear-gradient(135deg, #4e54c8, #8f94fb);
+            color: #fff;
+            border: none;
+            font-weight: 600;
+        }
+
+            #downloadDropdown:hover {
+                background: linear-gradient(135deg, #6a5af9, #a29bfe);
+            }
+
+        /* Dropdown Menu */
+        .dropdown-menu {
+            border-radius: 0.5rem;
+            min-width: 160px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        /* Excel Item */
+        .dropdown-item.excel-item {
+            background: #28a745;
+            color: #fff;
+            font-weight: 500;
+        }
+
+            .dropdown-item.excel-item:hover {
+                background: #218838;
+            }
+
+        /* CSV Item */
+        .dropdown-item.csv-item {
+            background: #fd7e14;
+            color: #fff;
+            font-weight: 500;
+        }
+
+            .dropdown-item.csv-item:hover {
+                background: #e36b0a;
+            }
+
+        /* PDF Item */
+        .dropdown-item.pdf-item {
+            background: #dc3545;
+            color: #fff;
+            font-weight: 500;
+        }
+
+            .dropdown-item.pdf-item:hover {
+                background: #b02a37;
+            }
+
+        /* Icons spacing */
+        .dropdown-item i {
+            margin-right: 8px;
+            font-size: 1.1rem;
+        }
+
+
     </style>
 }

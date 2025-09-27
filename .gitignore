@@ -1,0 +1,17 @@
+# Visual Studio temporary files
+.vs/
+bin/
+obj/
+*.user
+*.suo
+*.cache
+*.pdb
+*.exe
+*.dll
+*.bak
+*.log
+*.vsidx
+
+# Others
+*.db
+*.DS_Store
